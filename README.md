@@ -4,6 +4,10 @@ Jogo de estratégia econômica medieval desenvolvido em Java 17.
 
 Etapas desenvolvidas
 
+
+
+
+
 Etapa 1
 
 Classe Main.
@@ -11,6 +15,10 @@ Classe Main.
 Classe Menu.
 
 Menu interativo.
+
+
+
+
 
 Etapa 2
 
@@ -21,6 +29,10 @@ Classe Cidade.
 Cadastro do jogador e cidade.
 
 Status da cidade.
+
+
+
+
 
 Etapa 3
 
@@ -35,6 +47,10 @@ Compra e venda de grãos.
 Compra e venda de terras.
 
 Validação dos recursos.
+
+
+
+
 
 Etapa 4
 
@@ -53,6 +69,10 @@ Distribuição de alimentos.
 Crescimento ou redução da população conforme a alimentação.
 
 Atualização do status da cidade com a quantidade de servos.
+
+
+
+
 
 Como jogar
 
@@ -81,6 +101,10 @@ Colher: realiza o cultivo das terras e produz novos grãos, utilizando sementes.
 Distribuir alimentos: permite escolher um percentual entre 20% e 80% dos grãos disponíveis.
 
 A população cresce quando recebe alimentos suficientes e diminui quando há falta de alimentos.
+
+
+
+
 
 Estrutura
 
