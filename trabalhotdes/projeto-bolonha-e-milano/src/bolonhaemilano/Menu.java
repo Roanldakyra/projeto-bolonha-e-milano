@@ -3,207 +3,154 @@ package bolonhaemilano;
 import java.util.Scanner;
 
 public class Menu {
-    private Scanner scanner;
-    private boolean emExecucao;
+    private final Scanner scanner = new Scanner(System.in);
+    private boolean emExecucao = true;
     private Jogador jogador;
-    private Cidade cidade;
-    private Mercado mercado;
-    private Agricultura agricultura;
-
-    public Menu() {
-        scanner = new Scanner(System.in);
-        emExecucao = true;
-        mercado = new Mercado();
-        agricultura = new Agricultura();
-    }
+    private final Governo governo = new Governo();
+    private final Agricultura agricultura = new Agricultura();
+    private final Mercado mercado = new Mercado();
+    private final Construcoes construcoes = new Construcoes();
 
     public void executar() {
         while (emExecucao) {
-            exibirOpcoes();
-            int opcao = lerOpcao();
-            processarOpcao(opcao);
-        }
-    }
-
-    private void exibirOpcoes() {
-        System.out.println("\n===== BOLONHA E MILANO =====");
-        System.out.println("1 - Novo jogo");
-        System.out.println("2 - Ver status da cidade");
-        System.out.println("3 - Acessar mercado");
-        System.out.println("4 - Acessar agricultura");
-        System.out.println("5 - Sobre o jogo");
-        System.out.println("0 - Sair");
-        System.out.print("Escolha uma opção: ");
-    }
-
-    private int lerOpcao() {
-        String entrada = scanner.nextLine().trim();
-        try {
-            return Integer.parseInt(entrada);
-        } catch (NumberFormatException e) {
-            return -1;
-        }
-    }
-
-    private void processarOpcao(int opcao) {
-        switch (opcao) {
-            case 1: iniciarNovoJogo(); break;
-            case 2: exibirStatus(); break;
-            case 3:
-                if (cidade != null) abrirMercado();
-                else System.out.println("Inicie um novo jogo primeiro!");
-                break;
-            case 4:
-                if (cidade != null) abrirAgricultura();
-                else System.out.println("Inicie um novo jogo primeiro!");
-                break;
-            case 5: exibirSobre(); break;
-            case 0:
-                emExecucao = false;
-                System.out.println("Saindo do jogo...");
-                break;
-            default: System.out.println("Opção inválida!");
-        }
-    }
-
-    private void iniciarNovoJogo() {
-        System.out.print("Digite o nome do jogador: ");
-        String nomeJogador = scanner.nextLine().trim();
-        System.out.print("Digite o nome da cidade: ");
-        String nomeCidade = scanner.nextLine().trim();
-
-        if (nomeJogador.isEmpty() || nomeCidade.isEmpty()) {
-            System.out.println("Os nomes não podem ficar vazios.");
-            return;
-        }
-
-        jogador = new Jogador(nomeJogador);
-        cidade = new Cidade(nomeCidade, jogador);
-        System.out.println("Novo jogo iniciado com sucesso!");
-    }
-
-    private void exibirStatus() {
-        if (cidade == null) {
-            System.out.println("Nenhum jogo iniciado. Escolha Novo jogo primeiro.");
-            return;
-        }
-        cidade.exibirStatus();
-    }
-
-    private void abrirMercado() {
-        boolean noMercado = true;
-        while (noMercado) {
-            System.out.println("\n===== MERCADO =====");
-            System.out.println("Florins disponíveis: " + cidade.getFlorins());
-            System.out.println("Preço do grão: " + mercado.getPrecoGrao() + " florins por unidade");
-            System.out.println("Preço da terra: " + mercado.getPrecoTerra() + " florins por hectare");
-            System.out.println("1 - Comprar grãos");
-            System.out.println("2 - Vender grãos");
-            System.out.println("3 - Comprar terras");
-            System.out.println("4 - Vender terras");
-            System.out.println("0 - Voltar");
-            System.out.print("Escolha uma opção: ");
-
-            int opcao = lerOpcao();
+            System.out.println("\n===== BOLONHA E MILANO =====");
+            System.out.println("1 - Novo jogo / iniciar cidade");
+            System.out.println("2 - Exibir status");
+            System.out.println("3 - Agricultura");
+            System.out.println("4 - Mercado");
+            System.out.println("5 - Acessar governo");
+            System.out.println("6 - Acessar construcoes");
+            System.out.println("0 - Sair");
+            int opcao = lerInteiro("Escolha: ");
             switch (opcao) {
-                case 1: comprarGraos(); break;
-                case 2: venderGraos(); break;
-                case 3: comprarTerras(); break;
-                case 4: venderTerras(); break;
-                case 0: noMercado = false; break;
-                default: System.out.println("Opção inválida!");
+                case 1: iniciarJogo(); break;
+                case 2: if (temCidade()) jogador.getCidade().exibirStatus(); break;
+                case 3: menuAgricultura(); break;
+                case 4: menuMercado(); break;
+                case 5: abrirGoverno(); break;
+                case 6: abrirConstrucoes(); break;
+                case 0: emExecucao = false; System.out.println("Programa encerrado."); break;
+                default: System.out.println("Opcao invalida.");
             }
         }
     }
 
-    private int lerQuantidade() {
-        System.out.print("Digite a quantidade: ");
-        int quantidade = lerOpcao();
-        if (quantidade <= 0) {
-            System.out.println("Digite uma quantidade inteira maior que zero.");
-            return 0;
+    private void iniciarJogo() {
+        System.out.print("Nome do jogador: ");
+        String nome = scanner.nextLine().trim();
+        if (nome.isEmpty()) nome = "Jogador";
+        System.out.print("Nome da cidade: ");
+        String cidadeNome = scanner.nextLine().trim();
+        if (cidadeNome.isEmpty()) cidadeNome = "Bolonha";
+        Cidade cidade = new Cidade(cidadeNome, 100, 10, 50, 20);
+        jogador = new Jogador(nome, cidade);
+        System.out.println("Jogo iniciado para " + nome + ".");
+    }
+
+    private void abrirGoverno() {
+        if (!temCidade()) return;
+        boolean noGoverno = true;
+        while (noGoverno) {
+            Cidade cidade = jogador.getCidade();
+            System.out.println("\n===== GOVERNO =====");
+            System.out.println("Florins: " + cidade.getFlorins());
+            System.out.println("Taxa atual: " + cidade.getTaxaImposto() + "%");
+            System.out.println("Justica: " + cidade.getNivelJustica());
+            System.out.println("1 - Arrecadar impostos");
+            System.out.println("2 - Definir taxa de imposto");
+            System.out.println("3 - Definir nivel de justica");
+            System.out.println("0 - Voltar");
+            int opcao = lerInteiro("Escolha: ");
+            switch (opcao) {
+                case 1:
+                    int valor = governo.arrecadarImpostos(cidade);
+                    System.out.println("Impostos arrecadados: " + valor + " florins.");
+                    break;
+                case 2:
+                    int taxa = lerInteiro("Nova taxa (0 a 50): ");
+                    System.out.println(governo.definirTaxaImposto(cidade, taxa) ? "Taxa atualizada." : "Taxa invalida.");
+                    break;
+                case 3:
+                    System.out.print("Nivel (Justa, Moderada ou Severa): ");
+                    String nivel = scanner.nextLine().trim();
+                    System.out.println(governo.definirJustica(cidade, nivel) ? "Justica atualizada." : "Nivel invalido.");
+                    break;
+                case 0: noGoverno = false; break;
+                default: System.out.println("Opcao invalida.");
+            }
         }
-        return quantidade;
     }
 
-    private void comprarGraos() {
-        int quantidade = lerQuantidade();
-        if (quantidade > 0 && mercado.comprarGraos(cidade, quantidade))
-            System.out.println("Compra de grãos realizada!");
-        else if (quantidade > 0)
-            System.out.println("Não foi possível comprar. Verifique seus florins.");
-    }
-
-    private void venderGraos() {
-        int quantidade = lerQuantidade();
-        if (quantidade > 0 && mercado.venderGraos(cidade, quantidade))
-            System.out.println("Venda de grãos realizada!");
-        else if (quantidade > 0)
-            System.out.println("Não foi possível vender. Verifique seu estoque de grãos.");
-    }
-
-    private void comprarTerras() {
-        int quantidade = lerQuantidade();
-        if (quantidade > 0 && mercado.comprarTerras(cidade, quantidade))
-            System.out.println("Compra de terras realizada!");
-        else if (quantidade > 0)
-            System.out.println("Não foi possível comprar. Verifique seus florins.");
-    }
-
-    private void venderTerras() {
-        int quantidade = lerQuantidade();
-        if (quantidade > 0 && mercado.venderTerras(cidade, quantidade))
-            System.out.println("Venda de terras realizada!");
-        else if (quantidade > 0)
-            System.out.println("Não foi possível vender. Verifique seu estoque de terras.");
-    }
-
-    private void abrirAgricultura() {
-        boolean naAgricultura = true;
-        while (naAgricultura) {
-            System.out.println("\n===== AGRICULTURA =====");
-            System.out.println("Terras: " + cidade.getTerras());
+    private void abrirConstrucoes() {
+        if (!temCidade()) return;
+        boolean nasConstrucoes = true;
+        while (nasConstrucoes) {
+            Cidade cidade = jogador.getCidade();
+            System.out.println("\n===== CONSTRUCOES =====");
+            System.out.println("Florins: " + cidade.getFlorins());
             System.out.println("Servos: " + cidade.getServos());
-            System.out.println("Grãos: " + cidade.getGraos());
-            System.out.println("\n1 - Colher");
-            System.out.println("2 - Distribuir alimentos");
+            System.out.println("Soldados: " + cidade.getSoldados());
+            System.out.println("Construcoes: " + cidade.getConstrucoes());
+            System.out.println("1 - Recrutar soldados (5 florins + 1 servo por soldado)");
+            System.out.println("2 - Construir (20 florins por construcao)");
             System.out.println("0 - Voltar");
-            System.out.print("Escolha uma opção: ");
 
-            int opcao = lerOpcao();
+            int opcao = lerInteiro("Escolha: ");
             switch (opcao) {
-                case 1: colher(); break;
-                case 2: distribuirAlimentos(); break;
-                case 0: naAgricultura = false; break;
-                default: System.out.println("Opção inválida!");
+                case 1: recrutarSoldados(); break;
+                case 2: construir(); break;
+                case 0: nasConstrucoes = false; break;
+                default: System.out.println("Opcao invalida.");
             }
         }
     }
 
-    private void colher() {
-        int hectares = agricultura.processarColheita(cidade);
-        System.out.println("\n===== COLHEITA REALIZADA =====");
-        System.out.println("Hectares cultivados: " + hectares);
-        System.out.println("Grãos disponíveis: " + cidade.getGraos());
+    private void recrutarSoldados() {
+        int quantidade = lerInteiro("Quantidade de soldados: ");
+        boolean sucesso = construcoes.recrutarSoldados(jogador.getCidade(), quantidade);
+        if (sucesso) System.out.println("Soldados recrutados com sucesso.");
+        else System.out.println("Nao foi possivel recrutar: verifique a quantidade, os florins e os servos.");
     }
 
-    private void distribuirAlimentos() {
-        System.out.print("Digite o percentual de distribuição (20 a 80): ");
-        int percentual = lerOpcao();
-        boolean sucesso = agricultura.distribuirAlimentos(cidade, percentual);
+    private void construir() {
+        int quantidade = lerInteiro("Quantidade de construcoes: ");
+        boolean sucesso = construcoes.construir(jogador.getCidade(), quantidade);
+        if (sucesso) System.out.println("Construcoes realizadas com sucesso.");
+        else System.out.println("Nao foi possivel construir: verifique a quantidade e os florins.");
+    }
 
-        if (sucesso) {
-            System.out.println("Alimentos distribuídos!");
-            System.out.println("Servos atuais: " + cidade.getServos());
-            System.out.println("Grãos restantes: " + cidade.getGraos());
-        } else {
-            System.out.println("Percentual inválido! Digite um valor entre 20 e 80.");
+    private void menuAgricultura() {
+        if (!temCidade()) return;
+        System.out.println("1 - Plantar (consome terras e graos)\n2 - Colher graos");
+        int op = lerInteiro("Escolha: ");
+        if (op == 1) {
+            int terras = lerInteiro("Terras a utilizar: ");
+            int graos = lerInteiro("Graos para plantio: ");
+            System.out.println(agricultura.plantar(jogador.getCidade(), terras, graos) ? "Plantio registrado." : "Recursos insuficientes ou valores invalidos.");
+        } else if (op == 2) {
+            int graos = lerInteiro("Quantidade de graos colhidos: ");
+            if (graos > 0) { agricultura.colher(jogador.getCidade(), graos); System.out.println("Colheita registrada."); }
+            else System.out.println("Quantidade invalida.");
         }
     }
 
-    private void exibirSobre() {
-        System.out.println("\nBolonha e Milano");
-        System.out.println("Jogo de estratégia e administração de uma cidade medieval.");
-        System.out.println("Etapa 4: agricultura e população.");
+    private void menuMercado() {
+        if (!temCidade()) return;
+        System.out.println("1 - Comprar graos (2 florins por unidade)\n2 - Vender graos (1 florim por unidade)");
+        int op = lerInteiro("Escolha: ");
+        int qtd = lerInteiro("Quantidade: ");
+        if (op == 1) System.out.println(mercado.comprarGraos(jogador.getCidade(), qtd, 2) ? "Compra realizada." : "Compra nao realizada.");
+        else if (op == 2) System.out.println(mercado.venderGraos(jogador.getCidade(), qtd, 1) ? "Venda realizada." : "Venda nao realizada.");
+    }
+
+    private boolean temCidade() {
+        if (jogador == null) { System.out.println("Inicie um jogo primeiro, na opcao 1."); return false; }
+        return true;
+    }
+
+    private int lerInteiro(String mensagem) {
+        System.out.print(mensagem);
+        try { return Integer.parseInt(scanner.nextLine().trim()); }
+        catch (NumberFormatException e) { return -1; }
     }
 }

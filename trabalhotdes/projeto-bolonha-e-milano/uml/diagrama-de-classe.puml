@@ -1,6 +1,6 @@
 
 @startuml
-title Bolonha e Milano - Diagrama de Classes - Etapa 4
+title Bolonha e Milano - Diagrama de Classes - Etapa 6
 
 skinparam classAttributeIconSize 0
 
@@ -15,6 +15,8 @@ class Menu {
     -cidade: Cidade
     -mercado: Mercado
     -agricultura: Agricultura
+    -governo: Governo
+    -construcoes: Construcoes
 
     +executar(): void
     -exibirOpcoes(): void
@@ -24,8 +26,12 @@ class Menu {
     -exibirStatus(): void
     -abrirMercado(): void
     -abrirAgricultura(): void
+    -abrirGoverno(): void
+    -abrirConstrucoes(): void
     -colher(): void
     -distribuirAlimentos(): void
+    -recrutarSoldados(): void
+    -construir(): void
     -exibirSobre(): void
 }
 
@@ -46,6 +52,10 @@ class Cidade {
     -terras: int
     -graos: int
     -servos: int
+    -taxaImposto: int
+    -nivelJustica: String
+    -soldados: int
+    -construcoes: int
 
     +getNome(): String
     +getAnoAtual(): int
@@ -54,6 +64,13 @@ class Cidade {
     +getTerras(): int
     +getGraos(): int
     +getServos(): int
+    +getTaxaImposto(): int
+    +getNivelJustica(): String
+    +getSoldados(): int
+    +getConstrucoes(): int
+
+    +setTaxaImposto(taxa: int): void
+    +setNivelJustica(nivel: String): void
 
     +avancarAno(): void
 
@@ -68,6 +85,12 @@ class Cidade {
 
     +adicionarServos(qtd: int): void
     +removerServos(qtd: int): boolean
+
+    +adicionarSoldados(qtd: int): void
+    +removerSoldados(qtd: int): boolean
+
+    +adicionarConstrucoes(qtd: int): void
+    +removerConstrucoes(qtd: int): boolean
 
     +exibirStatus(): void
 }
@@ -97,12 +120,39 @@ class Agricultura {
     +distribuirAlimentos(cidade: Cidade, percentual: int): boolean
 }
 
+class Governo {
+    +arrecadarImpostos(cidade: Cidade): int
+    +definirTaxaImposto(cidade: Cidade, taxa: int): boolean
+    +definirJustica(cidade: Cidade, nivel: String): boolean
+    -multiplicadorPara(nivel: String): double
+}
+
+class Construcoes {
+    -PRECO_SOLDADO: int
+    -SERVOS_POR_SOLDADO: int
+    -PRECO_CONSTRUCAO: int
+
+    +recrutarSoldados(cidade: Cidade, qtd: int): boolean
+    +construir(cidade: Cidade, qtd: int): boolean
+    +getPrecoSoldado(): int
+    +getPrecoConstrucao(): int
+}
+
 Main --> Menu : cria
+
 Menu --> Jogador : utiliza
 Menu --> Cidade : utiliza
 Menu --> Mercado : utiliza
 Menu --> Agricultura : utiliza
-Cidade --> Jogador : dono
+Menu --> Governo : utiliza
+Menu --> Construcoes : utiliza
+
+Jogador --> Cidade : possui
+
+Mercado ..> Cidade : utiliza
+Agricultura ..> Cidade : utiliza
+Governo ..> Cidade : utiliza
+Construcoes ..> Cidade : utiliza
 
 note bottom of Mercado
   Recebe Cidade como parâmetro.
@@ -112,6 +162,17 @@ end note
 note bottom of Agricultura
   Recebe Cidade como parâmetro.
   Não armazena referência à Cidade.
+end note
+
+note bottom of Governo
+  Gerencia impostos e nível de justiça.
+  Recebe Cidade como parâmetro.
+end note
+
+note bottom of Construcoes
+  Gerencia o recrutamento de soldados
+  e a construção de edifícios.
+  Recebe Cidade como parâmetro.
 end note
 
 @enduml
