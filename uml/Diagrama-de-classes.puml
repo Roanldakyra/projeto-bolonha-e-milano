@@ -1,0 +1,139 @@
+@startuml
+title Bolonha e Milano - Diagrama de Classes - Etapa 8
+skinparam classAttributeIconSize 0
+
+class Main { +main(args: String[]): void }
+class Menu {
+ -scanner: Scanner
+ -emExecucao: boolean
+ -partida: Partida
+ -cidade: Cidade
+ -mercado: Mercado
+ -agricultura: Agricultura
+ -governo: Governo
+ -construcoes: Construcoes
+ -nobreza: Nobreza
+ +executar(): void
+ -lerOpcao(): int
+ -lerQuantidade(): int
+ -lerInteiro(): int
+ -exigirJogoEmAndamento(): boolean
+ -iniciarNovoJogo(): void
+ -exibirStatus(): void
+ -abrirMercado(): void
+ -abrirAgricultura(): void
+ -abrirGoverno(): void
+ -abrirConstrucoes(): void
+ -encerrarTurno(): void
+ -exibirClassificacao(): void
+ -encerrarPartida(): void
+ -exibirSobre(): void
+}
+class Jogador {
+ -TITULOS: String[] {static}
+ -nome: String
+ -nivelTitulo: int
+ +Jogador(nome: String)
+ +getNome(): String
+ +getTitulo(): String
+ +getNivelTitulo(): int
+ +promover(): boolean
+ +ehMonarca(): boolean
+}
+class Cidade {
+ -nome: String
+ -anoAtual: int
+ -dono: Jogador
+ -florins/terras/graos/servos: int
+ -taxaImposto: int
+ -nivelJustica: String
+ -soldados/construcoes: int
+ -colheitaFeita: boolean
+ -impostosArrecadados: boolean
+ +avancarAno(): void
+ +isColheitaFeita(): boolean
+ +marcarColheitaFeita(): void
+ +isImpostosArrecadados(): boolean
+ +marcarImpostosArrecadados(): void
+ +setTaxaImposto(taxa): boolean
+ +setNivelJustica(nivel): boolean
+ +adicionarFlorins(q): void
+ +removerFlorins(q): boolean
+ +adicionarTerras(q): void
+ +removerTerras(q): boolean
+ +adicionarGraos(q): void
+ +removerGraos(q): boolean
+ +adicionarServos(q): void
+ +removerServos(q): boolean
+ +adicionarSoldados(q): void
+ +removerSoldados(q): boolean
+ +adicionarConstrucoes(q): void
+ +removerConstrucoes(q): boolean
+ +exibirStatus(): void
+}
+class Partida {
+ +MAXIMO_JOGADORES: int = 4 {static}
+ -ANO_FINAL: int = 1410 {static}
+ -cidades: List<Cidade>
+ -indiceAtual: int
+ +adicionarCidade(cidade): boolean
+ +getCidades(): List<Cidade>
+ +getCidadeAtual(): Cidade
+ +getAnoAtual(): int
+ +getAnoFinal(): int
+ +passarTurno(): boolean
+ +encerrarAno(nobreza): List<Cidade>
+ +terminou(): boolean
+ +determinarVencedor(nobreza): Cidade
+}
+class Mercado { +comprarGraos(c,q): boolean
+ +venderGraos(c,q): boolean
+ +comprarTerras(c,q): boolean
+ +venderTerras(c,q): boolean }
+class Agricultura { +processarColheita(cidade): int
+ +distribuirAlimentos(cidade,percentual): boolean }
+class Governo { +arrecadarImpostos(cidade): int
+ +definirTaxaImposto(cidade,taxa): boolean
+ +definirJustica(cidade,nivel): boolean }
+class Construcoes { +construir(cidade,q): boolean
+ +recrutarSoldados(cidade,q): boolean }
+class Nobreza { +calcularPrestigio(cidade): int
+ +prestigioParaProximoTitulo(jogador): int
+ +verificarPromocao(cidade): boolean }
+class Testes {
+ -aprovados: int {static}
+ -reprovados: int {static}
+ +main(args): void {static}
+ -verificar(desc,cond): void {static}
+ -novaCidade(): Cidade {static}
+ -testarCidade(): void {static}
+ -testarMercado(): void {static}
+ -testarAgricultura(): void {static}
+ -testarGoverno(): void {static}
+ -testarConstrucoes(): void {static}
+ -testarJogadorENobreza(): void {static}
+ -testarPartida(): void {static}
+}
+Main --> Menu
+Menu --> Partida
+Menu --> Cidade
+Menu --> Mercado
+Menu --> Agricultura
+Menu --> Governo
+Menu --> Construcoes
+Menu --> Nobreza
+Partida "1" o-- "1..4" Cidade
+Cidade --> Jogador : dono
+Testes ..> Cidade : testa
+Testes ..> Mercado : testa
+Testes ..> Agricultura : testa
+Testes ..> Governo : testa
+Testes ..> Construcoes : testa
+Testes ..> Jogador : testa
+Testes ..> Nobreza : testa
+Testes ..> Partida : testa
+note bottom of Testes
+  Classe de teste independente.
+  O jogo não depende dela.
+end note
+@enduml

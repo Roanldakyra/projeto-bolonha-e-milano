@@ -1,0 +1,32 @@
+@startuml
+title Bolonha e Milano - Sequência: Encerramento do ano
+actor Jogador
+participant ":Menu" as Menu
+participant ":Partida" as Partida
+participant ":Cidade" as Cidade
+participant ":Nobreza" as Nobreza
+participant "dono:Jogador" as Dono
+
+Jogador -> Menu : opção 7 (Encerrar turno)
+Menu -> Partida : passarTurno()
+Partida --> Menu : true (último jogador da rodada)
+Menu -> Partida : encerrarAno(nobreza)
+loop para cada cidade
+  Partida -> Cidade : avancarAno()
+  Partida -> Nobreza : verificarPromocao(cidade)
+  alt prestígio suficiente
+    Nobreza -> Dono : promover()
+    Dono --> Nobreza : true
+  else prestígio insuficiente
+    Nobreza --> Partida : false
+  end
+end
+Partida --> Menu : lista de cidades promovidas
+Menu -> Partida : terminou()
+alt partida terminou
+  Menu -> Partida : determinarVencedor(nobreza)
+  Menu --> Jogador : Fim de jogo + vencedor
+else partida continua
+  Menu --> Jogador : Agora é a vez do próximo jogador
+end
+@enduml
